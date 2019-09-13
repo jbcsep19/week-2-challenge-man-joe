@@ -57,14 +57,14 @@ import java.util.HashMap;
 import java.util.Random;
 import java.util.Locale;
 
-public class chipotlePlus {
+public class ChipPlus {
     static Random rnd = new Random();
     static double totalCost = 3.0; // starting price
     static int totalIngred = 0;
 
     static ArrayList<String> riceOptions  = new ArrayList<String>(Arrays.asList("white","brown","none","all"));
     static ArrayList<String> meatOptions = new ArrayList<String>(Arrays.asList("chicken", "steak", "carnidas", "chorizo",
-                                                        "sofritas", "veggies", "none", "all"));
+            "sofritas", "veggies", "none", "all"));
     static ArrayList<String> beanOptions = new ArrayList<String>(Arrays.asList("pinto","black","none"));
     static ArrayList<String> salsaOptions = new ArrayList<String>(Arrays.asList("mild", "medium", "hot", "none", "all")); // Can count as 1 ingredient
     static ArrayList<String> veggieOptions = new ArrayList<String>(Arrays.asList("lettuce", "fajita veggies", "none", "all"));
@@ -72,11 +72,11 @@ public class chipotlePlus {
     static HashMap<Integer, String> moreToppings = new HashMap<Integer, String>(){
         private static final long serialVersionUID = 1L;
         {
-        put(0, "cheese");
-        put(1, "guac");
-        put(2, "queso");
-        put(3, "sour cream");
-    }};
+            put(0, "cheese");
+            put(1, "guac");
+            put(2, "queso");
+            put(3, "sour cream");
+        }};
 
     private static String chosenRice(int riceChoice){
         if(riceChoice == 2){ // choice is none
@@ -97,11 +97,11 @@ public class chipotlePlus {
 
         if(meatChoice == 6){ // choice is none
             meatReturn.add("no meat");
-        } else if(meatChoice == 7) { //choice is all 
+        } else if(meatChoice == 7) { //choice is all
             totalCost = totalCost + (6*.5); // 6 options * .5
             totalIngred += 6;
             for(int i = 0; i < 6; i++)
-                meatReturn.add(meatOptions.get(i)); 
+                meatReturn.add(meatOptions.get(i));
         } else {
             totalCost = totalCost + .5;
             totalIngred++;
@@ -144,7 +144,7 @@ public class chipotlePlus {
         if(veggieChoice == 2 || (veggieChoice == 3 && (totalIngred + 2) > 9) || totalIngred == 9){
             veggieReturn.add("no veggies");
         } else if(veggieChoice == 3 && (totalIngred + 2) < 9){
-            totalCost = totalCost + (2*.5); // 2 veggie options * .5 
+            totalCost = totalCost + (2*.5); // 2 veggie options * .5
             totalIngred += 2;
             for(int i = 0; i < 2; i++)
                 veggieReturn.add(veggieOptions.get(i));
@@ -170,7 +170,7 @@ public class chipotlePlus {
         tempList.add(chosenBean(beanChoice));
         tempList.addAll(chosenSalsa(salsaChoice));
         tempList.addAll(chosenVeggie(veggieChoice));
-    
+
         return tempList;
     }
 
