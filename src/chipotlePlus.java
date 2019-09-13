@@ -50,9 +50,12 @@ Burrito 24: white rice, chorizo, no beans, mild salsa, no veggies	 $4.50
 Burrito 25: white rice, chorizo, black beans, no salsa, lettuce, fajita veggies, queso	 $6.00
  */
 
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Random;
+import java.util.Locale;
 
 public class chipotlePlus {
     static Random rnd = new Random();
@@ -60,17 +63,29 @@ public class chipotlePlus {
 
     static ArrayList<String> riceOptions  = new ArrayList<String>(Arrays.asList("white","brown","none","all"));
     static ArrayList<String> meatOptions = new ArrayList<String>(Arrays.asList("chicken", "steak", "carnidas", "chorizo",
-                                                        "sofritas", "veggies", "none"));
+                                                        "sofritas", "veggies", "none", "all"));
     static ArrayList<String> beanOptions = new ArrayList<String>(Arrays.asList("pinto","black","none"));
     static ArrayList<String> salsaOptions = new ArrayList<String>(Arrays.asList("mild", "medium", "hot", "none", "all")); // Can count as 1 ingredient
     static ArrayList<String> veggieOptions = new ArrayList<String>(Arrays.asList("lettuce", "fajita veggies", "none", "all"));
 
+    static HashMap<Integer, String> moreToppings = new HashMap<Integer, String>(){
+        /**
+        *
+        */
+        private static final long serialVersionUID = 1L;
+
+        {
+        put(0, "cheese");
+        put(1, "guac");
+        put(2, "queso");
+        put(3, "sour cream");
+    }};
 
     private static String chosenRice(int riceChoice){
         if(riceChoice == 2){ // choice is none
             return "no rice";
         } else if(riceChoice == 3) { //choice is all
-            totalCost = totalCost + 1;
+            totalCost = totalCost + (2*.5);
             return "white&brown rice";
         } else{
             totalCost = totalCost + .5;
@@ -78,13 +93,20 @@ public class chipotlePlus {
         }
     }
 
-    private static String chosenMeat(int meatChoice){
+    private static ArrayList<String> chosenMeat(int meatChoice){
+        ArrayList<String> meatReturn = new ArrayList<>();
+
         if(meatChoice == 6){ // choice is none
-            return "no meat";
-        } else{
+            meatReturn.add("no meat");
+        } else if(meatChoice == 7) { //choice is all 
+            totalCost = totalCost + (6*.5); // 6 options * .5
+            for(int i = 0; i < 6; i++)
+                meatReturn.add(meatOptions.get(i)); 
+        } else {
             totalCost = totalCost + .5;
-            return meatOptions.get(meatChoice);
+            meatReturn.add(meatOptions.get(meatChoice));
         }
+        return meatReturn;
     }
 
     private static String chosenBean(int beanChoice) {
@@ -102,7 +124,7 @@ public class chipotlePlus {
         if(salsaChoice == 3){
             salsaReturn.add("no salsa");
         } else if(salsaChoice == 4){
-            totalCost = totalCost + 2;
+            totalCost = totalCost + (3*.5);
             for(int i = 0; i < 3; i++)
                 salsaReturn.add(salsaOptions.get(i) + " salsa");
         } else {
@@ -112,22 +134,21 @@ public class chipotlePlus {
         return salsaReturn;
     }
 
-    //Fix this!!!!
-    private static ArrayList<String> chosenVeggies(int veggieChoice) {
-        ArrayList<String> veggiesReturn = new ArrayList<>();
+    private static ArrayList<String> chosenVeggie(int veggieChoice) {
+        ArrayList<String> veggieReturn = new ArrayList<>();
 
-        if(salsaChoice == 3){
-            salsaReturn.add("no salsa");
-        } else if(salsaChoice == 4){
-            totalCost = totalCost + 2;
-            for(int i = 0; i < 3; i++)
-                salsaReturn.add(salsaOptions.get(i) + " salsa");
+        if(veggieChoice == 2){
+            veggieReturn.add("no veggies");
+        } else if(veggieChoice == 3){
+            totalCost = totalCost + (2*.5); // 2 veggie options * .5 
+            for(int i = 0; i < 2; i++)
+                veggieReturn.add(veggieOptions.get(i));
         } else {
             totalCost = totalCost + .5;
-            salsaReturn.add(salsaOptions.get(salsaChoice) + " salsa");
+            veggieReturn.add(veggieOptions.get(veggieChoice));
         }
 
-        return salsaReturn;
+        return veggieReturn;
     }
 
     private static ArrayList<String> buildStandard() {
@@ -140,33 +161,40 @@ public class chipotlePlus {
         int veggieChoice = rnd.nextInt(veggieOptions.size());
 
         tempList.add(chosenRice(riceChoice));
-        tempList.add(chosenMeat(meatChoice));
+        tempList.addAll(chosenMeat(meatChoice));
         tempList.add(chosenBean(beanChoice));
         tempList.addAll(chosenSalsa(salsaChoice));
+        tempList.addAll(chosenVeggie(veggieChoice));
+    
         return tempList;
     }
 
     public static void main(String[] args) {
         ArrayList<String> chosenIngred = new ArrayList<>();
+        //String printBurr = "Burrito ";
+        double numIngredToAdd = 0; // Don't know yet...
+        NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(Locale.US);
 
-
-
-        int numOfIngredients = rnd.nextInt(5) + 5;
-
-        //Build Standard burrito if numOfIngredients  == 5
+        //Build Standard burrito if numOfIngredients... may have 5 ingredients
 
         for(int i = 0; i < 25; i++) { // building 25 burritos
-
-            if(numOfIngredients == 5){//standard burrito
-                chosenIngred = buildStandard();
+            chosenIngred = buildStandard();
+            //ingredients are less than 5 if cost is less than $5.50
+            if(totalCost < 5.5){
+                numIngredToAdd = (5.5 - totalCost) / .5;
+                //System.out.println(numIngredToAdd);
+                while(numIngredToAdd != 0.0){
+                    String chosenTopping = moreToppings.get(rnd.nextInt(4)); //4 choices
+                    if(!chosenIngred.contains(chosenTopping)){
+                        chosenIngred.add(chosenTopping);
+                        totalCost += .5;
+                        numIngredToAdd = numIngredToAdd - 1.0;
+                    }
+                }
             }
+            String ingredPrint = chosenIngred.toString().substring(1,chosenIngred.toString().length() -1);
+            System.out.println("Burrito " + i + ": " + ingredPrint + "\t" + currencyFormat.format(totalCost));
+            totalCost = 3.0; // reset burrito
         }
-
-//
-//        Cheese: yes/no
-//        Guac: yes/no
-//        Queso: yes/no
-//        Sour cream: yes/no
-
     }
 }
